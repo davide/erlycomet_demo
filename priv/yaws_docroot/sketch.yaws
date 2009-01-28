@@ -1,0 +1,108 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+		"http://www.w3.org/TR/html4/strict.dtd">
+<html>
+	<head>
+		<title>Annotator/Figure Testing</title>
+		<link href="http://ajax.googleapis.com/ajax/libs/dojo/1.2.3/dojo/resources/dojo.css" type="text/css" rel="stylesheet"/>
+		<link href="http://ajax.googleapis.com/ajax/libs/dojo/1.2.3/dijit/themes/tundra/tundra.css" type="text/css" rel="stylesheet"/>
+		<link href="http://ajax.googleapis.com/ajax/libs/dojo/1.2.3/dojox/sketch/resources/sketch.css" type="text/css" rel="stylesheet"/>
+		
+		<link rel="stylesheet" href="styles.css" type="text/css" media="screen">
+		
+		<style type="text/css">
+			body {
+				background:#fff url("images/testsBodyBg.gif") repeat-x top left;
+				padding:1em 3em;
+			}
+			table { margin:0; width:100%;}
+			table tr td { padding:0; }
+			table tr td table { border:0; width:auto;}
+
+			#toolbar{ width:720px; }
+			#canvas{ width:720px; height:400px; background-color:#fff;border:1px solid #ccc; overflow:auto;position:relative;}
+			#chat { width: 40em }
+		</style>
+		<script type="text/javascript"
+			djConfig="isDebug: true, parseOnLoad: true"
+			src="http://ajax.googleapis.com/ajax/libs/dojo/1.2.3/dojo/dojo.xd.js"></script>
+		<script src="dojox/sketch/Toolbar.js"></script>
+		<script>
+		    dojo.require("dojox.cometd");
+			dojo.require("dojox.sketch");
+			dojo.require("dojox.sketch.Slider");
+			dojo.require("dojox.sketch.LeadAnnotation");
+			dojo.require("dojox.sketch.UnderlineAnnotation");
+			dojo.require("dojox.sketch.SingleArrowAnnotation");
+			dojo.require("dojox.sketch.DoubleArrowAnnotation");
+			dojo.require("dojox.sketch.PreexistingAnnotation");
+			
+			var f, a, t;
+
+			function sketch_init(){
+				var ta=dojox.sketch;
+				f=new ta.Figure();
+
+				t=ta.makeToolbar(dojo.byId("toolbar"), f);
+
+				//	test loading from an SVG file
+				dojo.xhrGet({
+					url:"dojox/sketch/tests/annotation.svg",
+					preventCache:true,
+					load:function(data, ioArgs){
+						f.load(dojox.xml.DomParser.parse(data), dojo.byId("canvas"));
+					}
+				});
+			}			
+		</script>
+		
+		<script type="text/javascript" src="chat.js"></script>
+		
+		<script type="text/javascript">
+		dojo.addOnLoad(function(){
+			var baseUrl = "<erl>
+out(Arg) ->
+	Req = Arg#arg.req,
+	Headers = Arg#arg.headers,
+	Host = Headers#headers.host,
+	Url = yaws_api:request_url(Arg),
+	Server = Url#url.scheme ++ "://" ++ Host ++ "/",
+	{html, Server}.
+</erl>";
+		   dojox.cometd.init(baseUrl + 'cometd');
+		});
+		dojo.addOnLoad(room, "_init");
+		
+		dojo.addOnUnload(room,"leave");	
+		dojo.addOnUnload(function(){
+		   dojox.cometd.disconnect();
+		});
+	</script>		
+</head>
+<body class="tundra">
+		<h1>Annotator/Figure Testing Platform - Cometified for collaborative drawing</h1>
+		<p>This is a generic test to create a figure from an existing SVG file, to edit that figure, and to test the undo stack. Double click a shape to set new text for it.</p>
+		
+		<div class="sketch_container">
+			<div id="toolbar"></div>
+			<div id="canvas"></div>
+		</div>
+		
+	 	<div class="container">
+			<div id="chat" class="output" style="height:14ex"></div><div id="members"></div>
+			<div class="input">
+				<div id="join" >
+					<form action="cometd" method="post">
+					Username:&nbsp;<input id="username" type="text"><input id="joinB" class="button" type="submit" name="join" value="Join"/>
+					</form>
+				</div>
+				<div id="joined" class="hidden">
+					Chat:&nbsp;<input id="phrase" type="text">
+					<input id="sendB" class="button" type="submit" name="join" value="Send">
+					<input id="leaveB" class="button" type="submit" name="join" value="Leave">
+				</div>
+			</div>
+		</div>
+		Use name::text for a private message
+		
+	</body>
+</html>

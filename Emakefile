@@ -1,0 +1,11 @@
+{"src/erlycomet_demo.erl", [debug_info, {d, debug}, {outdir, "ebin"}, {i, "include"}]}.
+{"src/erlycomet_demo_app.erl", [debug_info, {d, debug}, {outdir, "ebin"}, {i, "include"}]}.
+{"src/erlycomet_demo_rpc.erl", [debug_info, {d, debug}, {outdir, "ebin"}, {i, "include"}]}.
+{"src/erlycomet_demo_sup.erl", [debug_info, {d, debug}, {outdir, "ebin"}, {i, "include"}]}.
+{"src/erlycomet_demo_tick_server.erl", [debug_info, {d, debug}, {outdir, "ebin"}, {i, "include"}]}.
+{"src/erlycomet_demo_mochiweb_server.erl", [debug_info, {d, debug}, {outdir, "ebin"}, {i, "include"}]}.
+{"src/erlycomet_demo_yaws_server.erl", [debug_info, {d, debug}, {outdir, "ebin"}, {i, "include"}]}.
+{"src/erlycomet_demo_user_monitor.erl", [debug_info, {d, debug}, {outdir, "ebin"}, {i, "include"}]}.
+{"src/erlycomet_demo_inactive_connections_monitor.erl", [debug_info, {d, debug}, {outdir, "ebin"}, {i, "include"}]}.
+{"src/erlycomet_demo_chatroom_user.erl", [debug_info, {d, debug}, {outdir, "ebin"}, {i, "include"}]}.
+{"src/erlycomet_demo_private_messenger.erl", [debug_info, {d, debug}, {outdir, "ebin"}, {i, "include"}]}.

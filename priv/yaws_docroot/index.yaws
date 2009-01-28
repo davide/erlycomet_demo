@@ -1,0 +1,135 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
+   "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>ErlyComet dojo demo</title>
+	<link rel="stylesheet" href="styles.css" type="text/css" media="screen">
+	
+	<script type="text/javascript"
+		djConfig="isDebug: true"
+		src="http://ajax.googleapis.com/ajax/libs/dojo/1.2.3/dojo/dojo.xd.js"></script>
+	
+	<!-- for development and debugging comment the script above and uncomment the script below -->
+	<!-- (and you must put a local copy of dojo and dojox in demo-docroot)                     -->  
+	
+    <!--
+	<script type="text/javascript"
+		djConfig="isDebug: true"
+		src="dojo/dojo.js"></script>
+	-->	
+			
+	<script type="text/javascript">
+        dojo.require("dojox.cometd");
+
+		var counter = {
+			start_stop: function(){
+				if (dojo.byId("counter_button").innerHTML == "subscribe"){
+			      dojox.cometd.subscribe("/test/time", this, "update"); 
+			      dojo.byId("counter_button").innerHTML = "unsubscribe";
+			    } else {
+			      dojox.cometd.unsubscribe("/test/time"); 
+			      dojo.byId("counter_output").innerHTML = "";
+			      dojo.byId("counter_button").innerHTML = "subscribe";				   
+			    }
+			},
+			update: function(msg){
+				dojo.byId("counter_output").innerHTML = msg.data;
+			}	
+		}
+
+		var rpc = {
+			_id:0,
+			invoke: function(){
+				var text = dojo.byId('rpc_text').value;
+				var delay = dojo.byId('rpc_delay').value;
+				dojox.cometd.startBatch();
+			    dojox.cometd.subscribe("/rpc/test", this, "result"); 	
+			    dojox.cometd.publish("/rpc/test", { id:rpc._id, method:"delayed_echo", params:[text, delay]});				
+			    dojox.cometd.endBatch();
+			    rpc._id = rpc._id + 1;		   
+			},
+			result: function(msg){
+				dojo.byId("rpc_output").innerHTML = msg.data.result;
+				dojox.cometd.unsubscribe("/rpc/test"); 
+			}	
+		}		
+		</script>
+		
+		<script type="text/javascript" src="chat.js"></script>
+		
+		<script type="text/javascript">
+		dojo.addOnLoad(function(){
+			var baseUrl = "<erl>
+out(Arg) ->
+	Req = Arg#arg.req,
+	Headers = Arg#arg.headers,
+	Host = Headers#headers.host,
+	Url = yaws_api:request_url(Arg),
+	Server = Url#url.scheme ++ "://" ++ Host ++ "/",
+	{html, Server}.
+</erl>";
+		   dojox.cometd.init(baseUrl + 'cometd');
+		   dojo.connect(dojo.byId("counter_button"), "onclick", counter, "start_stop");
+		   dojo.connect(dojo.byId("rpc_button"), "onclick", rpc, "invoke");
+		});
+		dojo.addOnLoad(room, "_init");
+		
+		dojo.addOnUnload(room,"leave");	
+		dojo.addOnUnload(function(){
+		   dojox.cometd.disconnect();
+		});	
+					
+	</script>
+</head>
+<body>
+	<h2>ErlyComet simple demos (<a href="http://dojotoolkit.org">dojo Javascript toolkit</a>)</h2>
+
+	<h3>1. Epoch-time-mod-1000 counter</h3>
+	<div class="container">
+   		<div id="counter_output" class="output" style="height:3ex"></div>
+   		<div class="input">
+    		<div>
+       			Server side implemented counter:&nbsp;
+				<button id="counter_button">subscribe</button>
+     		</div>
+    	</div>
+   	</div>
+
+	<h3>2. RPC - delayed echo</h3>
+	<div class="container">
+   		<div id="rpc_output" class="output" style="height:3ex"></div>
+   		<div class="input">
+    		<div>
+    			Value:
+				<input id="rpc_text" type="text">&nbsp;&nbsp;
+				Delay (in sec):
+				<input id="rpc_delay" type="text">&nbsp;
+                <input id="rpc_button" class="button" type="submit" name="join" value="Invoke">
+    		</div>
+    	</div>
+   	</div>		
+
+	<h3>3. Simple Chat (code adapted from: http://cometd.com/ SVN repository)</h3>	
+ 	<div class="container">
+		<div id="chat" class="output" style="height:14ex"></div><div id="members"></div>
+		<div class="input">
+			<div id="join" >
+				<form action="cometd" method="post">
+   				Username:&nbsp;<input id="username" type="text"><input id="joinB" class="button" type="submit" name="join" value="Join"/>
+				</form>
+  			</div>
+   			<div id="joined" class="hidden">
+   				Chat:&nbsp;<input id="phrase" type="text">
+   				<input id="sendB" class="button" type="submit" name="join" value="Send">
+   				<input id="leaveB" class="button" type="submit" name="join" value="Leave">
+   			</div>
+   		</div>
+	</div>
+	Use name::text for a private message
+	<p>
+		For a collaborative drawing example <a href="/sketch.html">click here</a>. Currently not working! :P
+	</p>	
+</body>
+
+
